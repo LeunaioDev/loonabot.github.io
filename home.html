@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Steam User Status Checker</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+<body>
+    <h1>Steam User Status Checker</h1>
+    <label for="steamId">Enter Steam User ID:</label>
+    <input type="text" id="steamId" name="steamId">
+    <button onclick="checkStatus()">Check Status</button>
+    <div id="status"></div>
+
+    <script>
+        function checkStatus() {
+            var steamId = document.getElementById('steamId').value;
+            var apiKey = 'C82411981FA3ED92A9744F9FD4F30A8F'; // Replace this with your Steam API key
+            
+            $.ajax({
+                url: 'https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v2/?key=' + apiKey + '&steamids=' + steamId,
+                success: function(data) {
+                    var player = data.response.players[0];
+                    var status = player.personastate;
+                    var game = player.gameextrainfo;
+
+                    var statusText = '';
+                    if (status == 0) {
+                        statusText = 'Offline';
+                    } else if (status == 1) {
+                        statusText = 'Online';
+                    } else if (status == 2) {
+                        statusText = 'Busy';
+                    } else if (status == 3) {
+                        statusText = 'Away';
+                    } else if (status == 4) {
+                        statusText = 'Snooze';
+                    } else if (status == 5) {
+                        statusText = 'Looking to trade';
+                    } else if (status == 6) {
+                        statusText = 'Looking to play';
+                    }
+
+                    var message = 'Status: ' + statusText;
+                    if (status == 1 && game) {
+                        message += ', Playing: ' + game;
+                    }
+
+                    document.getElementById('status').innerText = message;
+                },
+                error: function() {
+                    document.getElementById('status').innerText = 'Error retrieving user information.';
+                }
+            });
+        }
+    </script>
+</body>
+</html>
